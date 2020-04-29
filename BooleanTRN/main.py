@@ -14,9 +14,13 @@ data = [
     ["d", "a", 1],
 ]
 
+# Mutant, Affects, Positive/Negative
+expectation = [
+    ["a", "b", 1],
+    ["a", "c", 1]
+]
+
 g = Graph()
 g.make_from_data(data)
 g.set_initial_condition({"a": False}, fill_default=True)
-g.update(50)
-
-g.print_history()
+g.check_expectation(expectation)

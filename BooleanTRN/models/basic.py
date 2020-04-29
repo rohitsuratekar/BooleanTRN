@@ -27,6 +27,8 @@ class Graph:
         self._history = defaultdict(list)
         self._unique_expression = None
         self._time = 0
+        self.default_steps = 100
+        self._mutants = []
         # Last element in history will be the current expression
 
     @property
@@ -180,3 +182,19 @@ class Graph:
         print(f" \t   {[x for x in range(self._time)]}")
         for h in self.history:
             print(f"{h} \t-> {[int(x) for x in self.history[h]]}")
+
+    def reset_history(self):
+        temp = {}
+        for h in self.history:
+            self._history[h] = [self.history[h][0]]
+            temp[h] = self.history[h][0]
+
+        self._current_expression = temp
+        self._time = 1
+        self._unique_expression = None
+
+    def check_expectation(self, data: list):
+        self.reset_history()
+        self.update(self.default_steps)
+        temp = self._current_expression
+        self.update(23)
