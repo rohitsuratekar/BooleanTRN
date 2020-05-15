@@ -39,7 +39,7 @@ MANIFEST
 pip-log.txt
 pip-delete-this-directory.txt
 
-# Unit test / coverage reports
+# Unit 5UTR_NNN_3UTR_30_CLUSTALO_aln_ordered.fas1line / coverage reports
 htmlcov/
 .tox/
 .nox/
