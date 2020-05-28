@@ -5,6 +5,6 @@
 #
 # Main file which will deal with all functions available in this library.
 
-from BooleanTRN.models.network import run
+from BooleanTRN.analysis import run
 
 run()
