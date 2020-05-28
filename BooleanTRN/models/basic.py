@@ -129,3 +129,12 @@ class NOT(LogicalOperation):
 
     def state(self) -> bool:
         return not bool(self.args[0])
+
+
+def run():
+    a = Variable("a", True)
+    b = Variable("b", True)
+    c = Variable("c", True)
+
+    f = AND(AND(a, b), c)
+    print(f)
