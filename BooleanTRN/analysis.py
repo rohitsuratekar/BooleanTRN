@@ -5,16 +5,20 @@
 #
 # All analysis will be done here.
 
-import itertools
-from typing import List, Union
+from typing import List
 
 from BooleanTRN.models.basic import *
 from BooleanTRN.models.basic import LogicalOperation as LogOp
 
 
-def remove_redundant(operators: List[LogOp]):
+def remove_redundant(operators: List[LogOp]) -> List[LogOp]:
+    final_list = []
+    dnf_list = []
     for op in operators:
-        print(op)
+        if op.short_dnf() not in dnf_list:
+            final_list.append(op)
+            dnf_list.append(op.short_dnf())
+    return final_list
 
 
 def assign_operators(variables: List[Union[LogOp, Variable]], target: bool):
@@ -31,20 +35,31 @@ def assign_operators(variables: List[Union[LogOp, Variable]], target: bool):
 
             if bool(cond) == target:
                 final_list.append(cond)
-    remove_redundant(final_list)
+
+    return remove_redundant(final_list)
 
 
-def test(variables: List[Union[LogOp, Variable]], target: bool):
+def unique_connections(variables: List[Union[LogOp, Variable]], target: bool):
     v = [[x, NOT(x)] for x in variables]
-    final_list = []
+    temp_list = []
     for m in itertools.product(*v):
-        assign_operators(list(m), target)
-        break
+        temp_list.extend(assign_operators(list(m), target))
+
+    final_list = []
+    dnf_list = []
+    for f in temp_list:
+        if f.short_dnf() not in dnf_list:
+            final_list.append(f)
+            dnf_list.append(f.short_dnf())
+
+    return final_list
 
 
 def run():
     a = Variable("a", True)
     b = Variable("b", True)
-    c = Variable("c", False)
+    c = Variable("c", True)
     d = Variable("d", False)
-    test([a, b, c], True)
+    e = Variable("e", False)
+    connections = unique_connections([a, b, c], False)
+    print(len(connections))
