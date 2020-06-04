@@ -6,5 +6,10 @@
 # Main file which will deal with all functions available in this library.
 
 from BooleanTRN.analysis import run
+import timeit
 
-run()
+time = timeit.timeit('run()',
+                     'from __main__ import run',
+                     number=1)
+
+print(f"Total time: {time:.3} seconds")

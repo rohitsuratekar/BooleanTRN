@@ -15,20 +15,22 @@ def convert_to_short_hand(opt_list, connector: str):
             return f"{v.name}"
         elif isinstance(v, NOT):
             return f"{v.args[0].name}_not"
+        else:
+            return f"{v.short()}"
 
     main_list = []
 
     for op in opt_list:
-        temp_str = []
-        tmp_connect = op.type
-        if isinstance(op, LogicalOperation):
+
+        if isinstance(op, OR) or isinstance(op, AND):
+            temp_str = []
+            tmp_connect = op.type
             for a in op.args:
                 temp_str.append(_attach(a))
+            temp_str = sorted(temp_str)
+            main_list.append(f"_{tmp_connect}_".join(temp_str))
         else:
-            temp_str.append(_attach(op))
-
-        temp_str = sorted(temp_str)
-        main_list.append(f"_{tmp_connect}_".join(temp_str))
+            main_list.append(_attach(op))
 
     main_list = sorted(main_list)
 
@@ -227,6 +229,9 @@ class LogicalOperation(Operations):
 
     def short_cnf(self):
         return convert_to_short_hand(self.cnf_literals(), "AND")
+
+    def short(self):
+        return convert_to_short_hand(self.args, self.type)
 
 
 class OR(LogicalOperation):
