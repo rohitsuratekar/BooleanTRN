@@ -81,4 +81,4 @@ def run():
     d = Variable("d", False)
     e = Variable("e", False)
     ops = [OR, AND]
-    variable_combinations([a,b,c, d], True)
+    variable_combinations([a, b, c, d], True)
