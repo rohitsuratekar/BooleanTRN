@@ -3,7 +3,7 @@
 #
 #  This file is part of BooleanTRN project.
 #
-#  All basic models
+#  All basic oldmodels
 
 import itertools
 from typing import Union
