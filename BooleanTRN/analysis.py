@@ -7,59 +7,50 @@
 
 from collections import defaultdict
 from BooleanTRN.models.logic import *
+from BooleanTRN.models.network import Network
+from BooleanTRN.models.graphics import draw_state_space
+from BooleanTRN.constants import BASE_NETWORK
 
 
-class NetworkAnalysis:
-    def __init__(self, data, initial_state):
-        self.data = data
-        self._nodes = None
-        self._current_state = None
-        self._history = None
-        self._initial_state = initial_state
+def cardio_network():
+    nkx25 = Variable("nkx2.5", True)
+    gata4 = Variable("gata4", True)
+    tbx5a = Variable("tbx5a", True)
+    mef2c = Variable("mef2c", True)
+    hand2 = Variable("hand2", True)
 
-    @property
-    def nodes(self) -> dict:
-        if self._nodes is None:
-            self._nodes = {}
-            temp = list(set([y for x in self.data for y in x[:2]]))
-            for t in temp:
-                try:
-                    self._nodes[t] = Variable(t, self.current_state[t], True)
-                except KeyError as k:
-                    raise KeyError(f"You have not provided initial "
-                                   f"condition for '{t}'") from k
-        return self._nodes
+    data = {
+        nkx25.name: OR(gata4, tbx5a),
+        gata4.name: tbx5a,
+        tbx5a.name: nkx25,
+        mef2c.name: OR(nkx25, gata4, tbx5a),
+        hand2.name: OR(gata4, mef2c)
+    }
 
-    @property
-    def current_state(self) -> dict:
-        if self._current_state is None:
-            self._current_state = {}
-            for key, item in self._initial_state:
-                self._current_state[key] = bool(item)
-        return self._current_state
+    n = Network(data)
+    draw_state_space(n)
 
-    def generate_network(self):
-        pass
+
+def auto_net():
+    all_nodes = {}
+    for b in BASE_NETWORK:
+        if b[0] not in all_nodes:
+            all_nodes[b[0]] = Variable(b[0], True)
+        for k in b[1]:
+            if k not in all_nodes:
+                all_nodes[k] = Variable(k, True)
+
+    data = {}
 
 
 def run():
-    data = [
-        ["a", "b", 1],
-        ["b", "c", 1],
-        ["g", "a", 1]
-    ]
-    initial_state = [
-        ["a", 1],
-        ["b", 0],
-        ["c", 1],
-        ["g", 1]
-    ]
-    a = Variable("a", True, True)
-    b = Variable("b", True, True)
-    c = Variable("c", False, True)
-    d = Variable("d", True, True)
-
-    net = {"a": OR(a, b), "b": OR(c, d)}
-    n = NetworkAnalysis(data, initial_state)
-
-    print(n.nodes)
+    auto_net()
+    # cardio_network()
+    # a = Variable("a", True)
+    # b = Variable("b", True)
+    # # c = Variable("c", True)
+    # #
+    # data = {"a": AND(a, b)}
+    # n = Network(data)
+    # # n.print_states()
+    # draw_state_space(n)

@@ -67,6 +67,22 @@ class Network:
         else:
             return [states[-1]]
 
+    def print_states(self):
+        states = self.find_states()
+        print(f"Nodes : {list(self.nodes.keys())}")
+        print(f"Steady State : {list(self.data.keys())}")
+        print("Nodes State -> Steady State")
+        for k in states:
+            print(f"{k[0]} -> {'/'.join(k[1])}")
+
+        uq = []
+        for u in [x[1] for x in states]:
+            uq.extend(u)
+
+        print("Unique steady states")
+        for u in set(uq):
+            print(u)
+
     def find_states(self):
         states = []
 
@@ -78,21 +94,7 @@ class Network:
             for i, key in enumerate(self.nodes):
                 self.nodes[key].state = x[i]
 
-            states.append((_convert(x), "/".join([_convert(x) for x in
-                                                  self.steady_states])))
-
-        print(f"Nodes : {list(self.nodes.keys())}")
-        print(f"Steady State : {list(self.data.keys())}")
-        print("Nodes State -> Steady State")
-        for k in states:
-            print(f"{k[0]} -> {k[1]}")
-
-
-def run():
-    a = Variable("a", True)
-    b = Variable("b", True)
-    c = Variable("c", False)
-
-    data = {"a": OR(a, c), "b": NOT(b)}
-    n = Network(data)
-    n.find_states()
+            states.append((_convert(x), [_convert(x) for x in
+                                         self.steady_states]))
+        self._reset_variables()
+        return states
