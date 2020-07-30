@@ -11,11 +11,14 @@ import matplotlib.pyplot as plt
 import networkx as nx
 from SecretColors import Palette
 from SecretPlots import BooleanPlot
+from SecretColors.utils import text_color
 
 from BooleanTRN.constants import *
 from BooleanTRN.models.graphics import draw_state_space
 from BooleanTRN.models.logic import *
 from BooleanTRN.models.network import Network
+
+GREEN = Palette().green(shade=40)
 
 
 def cardio_network():
@@ -92,6 +95,7 @@ def generate_network(network):
     graph = nx.Graph()
     initial_states = []
     for s in n.find_states():
+        print(s)
         nt = [s[0]]
         initial_states.append(s[0])
         for m in [_reduce_string(x) for x in s[1]]:
@@ -111,8 +115,9 @@ def generate_network(network):
             labels[n] = n
             colors.append(p.green())
 
+    _, ax = plt.subplots()
     pos = nx.spring_layout(graph, seed=1989)
-    nx.draw(graph, pos=pos, node_color=colors)
+    nx.draw(graph, pos=pos, node_color=colors, ax=ax)
 
     pos_higher = {}
     for k, v in pos.items():
@@ -120,9 +125,13 @@ def generate_network(network):
 
     nx.draw_networkx_labels(graph,
                             pos=pos_higher,
+                            font_color=text_color(GREEN),
                             labels=labels,
-                            bbox=dict(
-                                fc=p.green(shade=30)))
+                            bbox=dict(pad=5,
+                                      fc=GREEN),
+                            ax=ax)
+    plt.tight_layout()
+    plt.savefig("plot.png", dpi=300, transparent=True)
     plt.show()
 
 
@@ -149,37 +158,68 @@ def make_state_table(network):
     cp.show_grid = True
     cp.on_color = p.green(shade=30)
     cp.off_color = p.gray(shade=15)
-    cp.show(tight=True)
+    cp.save("plot.png", tight=True, dpi=300, transparent=True)
+    cp.show()
 
 
 def make_network(network):
     p = Palette()
-    graph = nx.DiGraph()
+    graph = nx.Graph()
     for d in network:
         graph.add_node(d[0])
         graph.add_nodes_from(d[1])
         for k in d[1]:
             graph.add_edge(d[0], k)
 
-    pos = nx.spring_layout(graph, seed=1989)
+    # pos = nx.spring_layout(graph, seed=1, k=0.3)
+    pos = nx.planar_layout(graph)
     labels = {}
-    colors = []
+
     for x in graph.nodes:
         if x in BASE_NODES:
             labels[x] = x
-            colors.append(p.green())
         else:
-            labels[x] = ""
-            colors.append(p.gray(shade=30))
+            labels[x] = x
 
-    nx.draw(graph, pos=pos, node_color=colors)
-    # nx.draw_networkx_labels(
-    #     graph,
-    #     pos=pos,
-    #     labels=labels,
-    #     bbox=dict(fc=p.green(shade=30)))
+    _, ax = plt.subplots()
+    nx.draw_networkx_nodes(graph, pos=pos,
+                           has_label=False, ax=ax)
+    nx.draw_networkx_edges(graph, pos=pos, ax=ax)
+    for key in pos:
+        x, y = pos[key]
+        fc_color = p.green(shade=40)
+        if key not in BASE_NODES:
+            fc_color = p.gray(shade=30)
+        ax.text(x, y, key,
+                bbox=dict(fc=fc_color, pad=5),
+                color=text_color(fc_color),
+                ha="center", va="center",
+                fontsize=12)
+    ax.axis('off')
+    plt.tight_layout()
+    plt.savefig("plot.png", dpi=300, transparent=True)
     plt.show()
 
 
+def test(network):
+    variables = {}
+    future = defaultdict(list)
+    for a, b in network:
+        variables[a] = Variable(a, True)
+        for c in b:
+            variables[c] = Variable(c, True)
+            future[c].append(a)
+
+    data = {}
+    for key, value in future.items():
+        all_inputs = [variables[x] for x in value]
+        data[key] = OR(*all_inputs)
+
+    final_net = Network(data)
+    final_net.print_states()
+
+
 def run():
-    make_network(EXTENDED_NETWORK)
+    # network = [("nkx2.5", ["gata4"])]
+    network = [("a", ["b"])]
+    test(network)

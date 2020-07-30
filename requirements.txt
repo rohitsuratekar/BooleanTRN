@@ -1,4 +1,4 @@
-pandas
-numpy
-SecretPlots
-SecretColors
+matplotlib==3.3.0
+networkx==2.4
+SecretColors==1.1.0
+SecretPlots==0.1.3
