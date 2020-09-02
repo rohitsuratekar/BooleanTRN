@@ -12,10 +12,9 @@
 BASE_NODES = ["nkx2.5", "tbx5a", "mef2ca", "hand2", "gata4"]
 
 BASE_NETWORK = [
-    ('nkx2.5', ['tbx5a', 'mef2ca']),
-    ('gata4', ['nkx2.5', 'hand2', 'mef2ca']),
-    ('tbx5a', ['nkx2.5', 'mef2ca', 'gata4']),
-    ('mef2ca', ['hand2'])
+    ('nkx2.5', ['tbx5a', 'mef2ca', 'gata4', 'hand2']),
+    ('gata4', ['hand2', 'mef2ca', 'tbx5a']),
+    ('tbx5a', ['nkx2.5'])
 ]
 
 # Following is original
@@ -32,7 +31,7 @@ EXTENDED_NETWORK = [
     ('gata4', ['nkx2.3', 'hey2', 'nkx2.5', 'hand2', 'mef2ca']),
     ('tbx5a', ['nkx2.3', 'smarca4', 'nkx2.5', 'mef2ca', 'gata4']),
     ('mef2ca', ['60976', '94868', 'ep300a', 'cabin1',
-                'crebbpa', 'bptf', 'crebbpb', 'ep300b', 'hand2']),
+                'crebbpa', 'bptf', 'crebbpb', 'ep300b']),
     ('hand2', [])]
 
 EXTENDED_NETWORK_EXTRA = [

@@ -222,4 +222,4 @@ def test(network):
 def run():
     # network = [("nkx2.5", ["gata4"])]
     network = [("a", ["b"])]
-    test(network)
+    make_network(network)
