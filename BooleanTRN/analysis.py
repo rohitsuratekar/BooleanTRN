@@ -10,34 +10,14 @@ from collections import defaultdict
 import matplotlib.pyplot as plt
 import networkx as nx
 from SecretColors import Palette
-from SecretPlots import BooleanPlot
 from SecretColors.utils import text_color
+from SecretPlots import BooleanPlot
 
 from BooleanTRN.constants import *
-from BooleanTRN.models.graphics import draw_state_space
 from BooleanTRN.models.logic import *
 from BooleanTRN.models.network import Network
 
 GREEN = Palette().green(shade=40)
-
-
-def cardio_network():
-    nkx25 = Variable("nkx2.5", True)
-    gata4 = Variable("gata4", True)
-    tbx5a = Variable("tbx5a", True)
-    mef2c = Variable("mef2c", True)
-    hand2 = Variable("hand2", True)
-
-    data = {
-        nkx25.name: OR(gata4, tbx5a),
-        gata4.name: tbx5a,
-        tbx5a.name: nkx25,
-        mef2c.name: OR(nkx25, gata4, tbx5a),
-        hand2.name: OR(gata4, mef2c)
-    }
-
-    n = Network(data)
-    draw_state_space(n)
 
 
 def _reduce_string(string):
