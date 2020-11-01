@@ -6,6 +6,6 @@
 # Main file which will deal with all functions available in this library.
 
 
-from BooleanTRN.graph import run
+from BooleanTRN.sweeps import run
 
 run()
