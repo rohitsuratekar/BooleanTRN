@@ -6,8 +6,10 @@
 
 import itertools as itr
 from collections import defaultdict
-from BooleanTRN.visualizations import plot_transition_graph, plot_network
+from BooleanTRN.visualizations import *
 import networkx as nx
+import json
+from collections import Counter
 
 
 class NetworkAnalyser:
@@ -153,7 +155,9 @@ def convert_to_dest(network):
     tmp = []
     for n in network:
         for des in network[n]:
-            tmp.append((des[0], n, 1))
+            # Remove auto links
+            if des[0] != n:
+                tmp.append((des[0], n, 1))
     return tmp
 
 
@@ -167,15 +171,91 @@ def test_network(network):
             state[i_space] = st
 
     des_net = convert_to_dest(network)
-    plot_network(des_net)
+    ga = GraphAdjustment(plot_network(des_net))
+    ga.highlight(4)
+    ga.draw()
     plot_transition_graph(state, filename="plot2.png")
 
 
-def run():
+def remove_isomorphic(network):
+    graphs = []
+    nets = []
+    for n in network:
+        g = nx.Graph()
+        for des in n:
+            for s in n[des]:
+                # Remove auto-links
+                if s[0] != des:
+                    g.add_edge(s[0], des)
+
+        if len(graphs) == 0:
+            graphs.append(g)
+            nets.append(n)
+        else:
+            if not any([nx.is_isomorphic(x, g) for x in graphs]):
+                graphs.append(g)
+                nets.append(n)
+
+    del graphs
+    return nets
+
+
+def save_network(networks):
+    son = {}
+    counter = 0
+    for n in networks:
+        son[counter] = n
+        counter += 1
+    with open("networks.json", "w") as f:
+        json.dump(son, f)
+
+
+def load_network():
+    with open("networks.json") as f:
+        mk = json.load(f)
+    con = []
+    for m in mk.values():
+        tmp = {}
+        for k in m:
+            tmp[int(k)] = [tuple(x) for x in m[k]]
+        con.append(tmp)
+    return con
+
+
+def flow_diagram(networks):
+    cn = Counter()
+    for n in networks:
+        for des in n:
+            for sor in n[des]:
+                # Remove auto link
+                if sor[0] != des:
+                    cn.update({(sor[0], des)})
+
+    data = []
+    for c in cn.most_common():
+        data.append(c)
+
+    g = network_flow_diagram(data, graph_opt={"bgcolor": "#ffffff"})
+    ga = GraphAdjustment(g)
+    ga.highlight(0)
+    ga.change_label(0, "nkx2.5")
+    ga.draw()
+
+
+def search_graphs():
     na = NetworkAnalyser(5, 4)
     na.connected = True
-    nts = na.find_multiple(["11111", "11110"])
-    # na.print_networks(nts)
-    nts = list(nts)
-    current = nts[150]
-    test_network(current)
+    nts = na.find_multiple(["11111", "01111"])
+    graphs = remove_isomorphic(nts)
+    print(len(graphs))
+    save_network(graphs)
+
+
+def analyse_graphs():
+    nts = load_network()
+    flow_diagram(nts)
+
+
+def run():
+    # analyse_graphs()
+    search_graphs()
