@@ -18,6 +18,7 @@ class NetworkAnalyser:
         self.no_of_edges = no_of_edges
         self.gates = [0]
         self.connected = False
+        self.negative_interactions = False
 
     def _get_pairs(self):
         possible = itr.product(range(self.no_of_nodes),
@@ -59,6 +60,10 @@ class NetworkAnalyser:
                 for i, o in enumerate(order):
                     new_net[o] = [(x, cg[i]) for x in n[o]]
                 yield new_net
+
+    def _add_interaction_types(self, network):
+        if not self.negative_interactions:
+            return network
 
     @staticmethod
     def get_state(network, initial_condition) -> str:
@@ -108,7 +113,8 @@ class NetworkAnalyser:
     def _extract_networks(self):
         pairs = self._get_pairs()
         networks = self._make_network(pairs)
-        return self._add_gates(networks)
+        gated = self._add_gates(networks)
+        return self._add_interaction_types(gated)
 
     def _validate_ss(self, value):
         if len(value.strip()) != self.no_of_nodes:
@@ -258,6 +264,9 @@ def analyse_graphs():
 
 def test_analysis():
     na = NetworkAnalyser(5, 1)
+    na.negative_interactions = True
+    for n in na.analyse():
+        pass
 
 
 def run():
