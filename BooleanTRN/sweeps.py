@@ -243,7 +243,7 @@ def flow_diagram(networks):
 
 
 def search_graphs():
-    na = NetworkAnalyser(5, 4)
+    na = NetworkAnalyser(5, 1)
     na.connected = True
     nts = na.find_multiple(["11111", "01111"])
     graphs = remove_isomorphic(nts)
@@ -256,6 +256,11 @@ def analyse_graphs():
     flow_diagram(nts)
 
 
+def test_analysis():
+    na = NetworkAnalyser(5, 1)
+
+
 def run():
     # analyse_graphs()
-    search_graphs()
+    # search_graphs()
+    test_analysis()
