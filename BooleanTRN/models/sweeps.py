@@ -3,10 +3,12 @@
 #
 #  This file is part of BooleanTRN project.
 #
+#  Main NetworkAnalyser class and realted functions
 
 import itertools as itr
-import networkx as nx
 from typing import Union
+
+import networkx as nx
 
 GATE_AND = 0
 GATE_OR = 1
@@ -46,7 +48,7 @@ class ConNode:
         return f"Node({self.name})"
 
 
-class TestAnalyser:
+class NetworkAnalyser:
     def __init__(self, no_of_nodes: int,
                  no_of_edges: int,
                  *,
@@ -234,7 +236,41 @@ class TestAnalyser:
                             yield r
 
 
-def run():
-    k = TestAnalyser(3, 1)
-    for m in k.find_networks():
-        print(m)
+class RawNetwork:
+    def __init__(self, data: dict):
+        self.data = data
+        self._nodes = None
+        self._edges = None
+        self._graph = None
+
+    @property
+    def nodes(self):
+        if self._nodes is None:
+            self._make()
+        return self._nodes
+
+    @property
+    def edges(self):
+        if self._edges is None:
+            self._make()
+        return self._edges
+
+    def _make(self):
+        self._nodes = []
+        self._edges = []
+        for des, value in self.data.items():
+            if des not in self._nodes:
+                self._nodes.append(des)
+            for action in value[1]:
+                if action[0] not in self._nodes:
+                    self._nodes.append(action[0])
+                self._edges.append((action[0], des, action[1]))
+
+    def network(self) -> nx.DiGraph:
+        if self._graph is not None:
+            return self._graph
+        graph = nx.DiGraph()
+        for e in self.edges:
+            graph.add_edge(e[0], e[1])
+        self._graph = graph
+        return self._graph

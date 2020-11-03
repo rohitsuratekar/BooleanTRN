@@ -2,6 +2,9 @@
 #  Author: Rohit Suratekar
 #
 #  This file is part of BooleanTRN project.
+#
+#
+#  This file is part of BooleanTRN project.
 #  All functions related to plotting will go here
 
 import pygraphviz as pgv
@@ -11,7 +14,7 @@ from SecretColors import Palette
 class GraphAdjustment:
     def __init__(self, graph: pgv.AGraph):
         self.graph = graph
-        self.filename = "plot.png"
+        self.filename = "../plot.png"
         self.layout = "dot"
         self.palette = Palette()
 
