@@ -201,7 +201,6 @@ class NetworkAnalyser:
         pairs = self._get_pairs()
         acts = self._add_interactions(pairs)
         raw = self._make_raw_network(acts)
-
         for r in raw:
             # If target is not provided return everything
             if targets is None:

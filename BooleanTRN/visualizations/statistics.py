@@ -8,7 +8,7 @@
 import csv
 from collections import defaultdict
 from multiprocessing import Process, Queue
-
+import math
 import matplotlib
 import matplotlib.pylab as plt
 from SecretColors import Palette
@@ -18,23 +18,26 @@ from BooleanTRN.models.sweeps import NetworkAnalyser
 matplotlib.rc("font", family="IBM Plex Sans")
 
 
-def cal_comb(q, network: NetworkAnalyser):
+# 5p1
+
+def cal_comb(q, network: NetworkAnalyser, analysis_id=0):
     c = 0
     for _ in network.find_networks():
         c += 1
-    q.put((network.no_of_nodes, network.no_of_edges, c))
+    q.put((network.no_of_nodes, network.no_of_edges, c, analysis_id))
 
 
 def generate_combinations():
     q = Queue()
-    actions = 4
+    actions = 8
     all_process = []
     for j in range(1, actions):
-        for i in range(2, 8):
-            na = NetworkAnalyser(i, j, allow_negative=True)
-            p = Process(target=cal_comb, args=(q, na))
-            p.start()
-            all_process.append(p)
+        na = NetworkAnalyser(5, j)
+        na.gates = [1, 0]
+        # na.is_connected = True
+        p = Process(target=cal_comb, args=(q, na, 2))
+        p.start()
+        all_process.append(p)
 
     data = []
     for _ in all_process:
@@ -42,17 +45,36 @@ def generate_combinations():
         print(data[-1])
 
     with open("out.csv", "w") as f:
-        print("nodes,edges,combinations", file=f)
+        print("nodes,edges,combinations,id", file=f)
         for d in data:
             print(",".join([str(x) for x in d]), file=f)
 
     print("Finished")
 
 
+def plot_single_node(no_of_nodes):
+    p = Palette()
+    actions = []
+    with open("out.csv") as f:
+        next(f)
+        for row in csv.reader(f):
+            if int(row[0]) == int(no_of_nodes):
+                actions.append((int(row[1]), int(row[2])))
+
+    actions = sorted(actions, key=lambda x: x[0])
+    values = [x[1] for x in actions]
+    actions = [x[0] for x in actions]
+
+    print(values)
+    plt.bar(range(min(actions), max(actions) + 1), values)
+    plt.yscale("log")
+    plt.show()
+
+
 def plot_combinations():
     p = Palette()
     dm = defaultdict(list)
-    with open("data/single.csv") as f:
+    with open("data/single_connected.csv") as f:
         next(f)
         data = csv.reader(f)
         for row in data:
@@ -70,7 +92,7 @@ def plot_combinations():
         plt.annotate(f"{combs[-1]}", xy=(nodes[-1] + 0.1, combs[-1]),
                      va="center")
     plt.yscale("log")
-    plt.title("type : 1, gates: 1", pad=20)
+    plt.title("type : 1, gates: 1, connected", pad=20)
     plt.xlabel("no. of nodes")
     plt.ylabel("no. of combinations")
     plt.legend(loc=0, ncol=2, title="Interactions")
@@ -82,6 +104,40 @@ def plot_combinations():
     plt.show()
 
 
+def permutations(n, r):
+    try:
+        return math.factorial(n) / math.factorial(n - r)
+    except ValueError:
+        return 0
+
+
+def calculate_combinations(n, r,
+                           with_negative=False,
+                           with_gates=True):
+    # Number of possible pairs
+    # 1 interaction will need 2 choices hence r+1
+    # additional n will be for self loops
+
+    pairs = permutations(n, 2) + n
+
+    # Add interactions
+    # We now need combinations and not permutations
+    interactions = permutations(pairs, r) / math.factorial(r)
+    if with_negative:
+        # Add negative interactions
+        # Every interaction will have choice of becoming positive or negative
+        interactions = interactions * pow(2, r)
+
+    if with_gates:
+        multi_comb = n * (permutations(n, r) / math.factorial(r))
+        single_pairs = interactions - multi_comb
+        interactions = (interactions - single_pairs) * pow(2, r)
+        interactions += 2 * multi_comb
+
+    return interactions
+
+
 def run():
     # plot_combinations()
-    generate_combinations()
+    # generate_combinations()
+    plot_single_node(5)

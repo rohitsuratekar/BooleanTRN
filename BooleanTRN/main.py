@@ -6,6 +6,6 @@
 # Main file which will deal with all functions available in this library.
 
 
-from BooleanTRN.visualizations.combinations import run
+from BooleanTRN.visualizations.statistics import run
 
 run()
