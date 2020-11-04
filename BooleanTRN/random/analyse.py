@@ -3,13 +3,16 @@
 #
 #  This file is part of BooleanTRN project.
 #
+#
+#  This file is part of BooleanTRN project.
+#
 
 from typing import List
 
 import networkx as nx
 
-from BooleanTRN.functions import generate_state_space
-from BooleanTRN.visualizations import *
+from BooleanTRN.models.functions import generate_state_space
+from BooleanTRN.visualizations.network import *
 
 BASE_NETWORK = [
     ('nkx2.5', ['tbx5a', 'mef2ca', 'gata4', 'hand2']),

@@ -8,6 +8,7 @@
 import csv
 from collections import defaultdict
 from multiprocessing import Process, Queue
+
 import math
 import matplotlib
 import matplotlib.pylab as plt
@@ -33,9 +34,9 @@ def generate_combinations():
     all_process = []
     for j in range(1, actions):
         na = NetworkAnalyser(5, j)
-        na.gates = [1, 0]
-        # na.is_connected = True
-        p = Process(target=cal_comb, args=(q, na, 2))
+        # na.gates = [1, 0]
+        na.is_connected = True
+        p = Process(target=cal_comb, args=(q, na, 5))
         p.start()
         all_process.append(p)
 
@@ -54,20 +55,42 @@ def generate_combinations():
 
 def plot_single_node(no_of_nodes):
     p = Palette()
-    actions = []
-    with open("out.csv") as f:
+    all_values = defaultdict(list)
+    with open("data/five_nodes.csv") as f:
         next(f)
         for row in csv.reader(f):
             if int(row[0]) == int(no_of_nodes):
-                actions.append((int(row[1]), int(row[2])))
+                all_values[int(row[3])].append((int(row[1]), int(row[2])))
 
-    actions = sorted(actions, key=lambda x: x[0])
-    values = [x[1] for x in actions]
-    actions = [x[0] for x in actions]
+    all_colors = [p.green(shade=60),
+                  p.ultramarine(),
+                  p.green(shade=50),
+                  p.green(shade=40),
+                  p.green(shade=30),
+                  ]
+    type_ids = ["2 types + 2 gates",
+                "2 types + 2 gates (connected)",
+                "2 types + 1 gate",
+                "1 type + 2 gates",
+                "1 type + 1 gate",
+                ]
 
-    print(values)
-    plt.bar(range(min(actions), max(actions) + 1), values)
+    for key, color, name in zip([3, 4, 1, 2, 0], all_colors, type_ids):
+        actions = all_values[key]
+        actions = sorted(actions, key=lambda x: x[0])
+        values = [x[1] for x in actions]
+        actions = [x[0] for x in actions]
+        plt.bar(range(min(actions), max(actions) + 1), values,
+                color=color, label=name, zorder=4)
+
     plt.yscale("log")
+    plt.legend(loc=0)
+    plt.xlabel("Number of Interactions")
+    plt.ylabel("Possible Networks")
+    plt.title(f"Number of nodes: {no_of_nodes}")
+    plt.gca().set_facecolor(p.gray(shade=15))
+    plt.grid(axis="y", ls=":", zorder=1)
+    plt.savefig("plot.png", dpi=300)
     plt.show()
 
 
