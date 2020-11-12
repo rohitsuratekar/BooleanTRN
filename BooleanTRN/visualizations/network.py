@@ -42,9 +42,10 @@ class GraphAdjustment:
         n = self.graph.get_node(node)
         n.attr['label'] = label
 
-    def highlight(self, node_name):
-        self.graph.get_node(node_name).attr['fillcolor'] = self.palette.red(
-            shade=30)
+    def highlight(self, node_name, color=None):
+        if color is None:
+            color = self.palette.red(shade=30)
+        self.graph.get_node(node_name).attr['fillcolor'] = color
 
     def mutant(self, node_name):
         node = self.graph.get_node(node_name)
@@ -104,10 +105,10 @@ def plot_transition_graph(data: dict,
 
     # For label manipulations
     for node in d.nodes_iter():
-        if str(node.name).endswith("0"):
+        if str(node.name).startswith("0"):
             clr = p.red(shade=60)
-            node.attr["label"] = f"<{node.name[:-1]}<FONT " \
-                                 f"COLOR='{clr}'>0</FONT>>"
+            node.attr["label"] = f"<<FONT " \
+                                 f"COLOR='{clr}'>0</FONT>{node.name[1:]}>"
 
     d.layout(layout)
     d.draw(filename)

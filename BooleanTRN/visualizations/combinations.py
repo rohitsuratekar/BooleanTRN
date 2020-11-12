@@ -15,13 +15,13 @@ from BooleanTRN.models.sweeps import RawNetwork, NetworkAnalyser
 np.random.seed(1989)
 
 
-def draw_possible_networks(networks, only_take=None):
+def draw_possible_networks(networks, only_take=None,
+                           filename: str = "plot.png"):
     p = Palette()
     data = []
     for n in networks:
         data.append(RawNetwork(n))
 
-    print(len(data))
     if only_take is not None:
         data = np.random.choice(data, only_take)
 
@@ -43,7 +43,7 @@ def draw_possible_networks(networks, only_take=None):
                          node_color=colors,
                          with_labels=False)
 
-    plt.savefig("plot.png", dpi=300)
+    plt.savefig(filename, dpi=300)
     plt.show()
 
 

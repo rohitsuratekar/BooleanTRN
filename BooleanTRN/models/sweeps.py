@@ -241,6 +241,7 @@ class RawNetwork:
         self._nodes = None
         self._edges = None
         self._graph = None
+        self._undirected = None
 
     @property
     def nodes(self):
@@ -273,3 +274,12 @@ class RawNetwork:
             graph.add_edge(e[0], e[1])
         self._graph = graph
         return self._graph
+
+    def undirected(self) -> nx.Graph:
+        if self._undirected is not None:
+            return self._undirected
+        graph = nx.Graph()
+        for e in self.edges:
+            graph.add_edge(e[0], e[1])
+        self._undirected = graph
+        return self._undirected
