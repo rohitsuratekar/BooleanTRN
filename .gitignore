@@ -143,3 +143,5 @@ cython_debug/
 .idea/*
 *.png
 BooleanTRN/networks.json
+test.txt
+BooleanTRN/networks.txt

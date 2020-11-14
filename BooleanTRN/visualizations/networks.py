@@ -9,6 +9,7 @@
 
 import pygraphviz as pgv
 from SecretColors import Palette
+from BooleanTRN.helpers.constants import *
 
 
 class GraphAdjustment:
@@ -103,13 +104,6 @@ def plot_transition_graph(data: dict,
         for key, value in color_mapping.items():
             d.get_node(key).attr["fillcolor"] = value
 
-    # For label manipulations
-    for node in d.nodes_iter():
-        if str(node.name).startswith("0"):
-            clr = p.red(shade=60)
-            node.attr["label"] = f"<<FONT " \
-                                 f"COLOR='{clr}'>0</FONT>{node.name[1:]}>"
-
     d.layout(layout)
     d.draw(filename)
     return d
@@ -149,58 +143,12 @@ def plot_network(data, *, layout: str = "dot",
         d.edge_attr[key] = value
     for row in data:
         d.add_edge(row[0], row[1])
+        if row[2] == INTERACTION_NEGATIVE:
+            d.get_edge(row[0], row[1]).attr['arrowhead'] = "dot"
+
+        if row[3] == GATE_AND:
+            d.get_node(row[1]).attr['fillcolor'] = p.ultramarine()
 
     d.layout(layout)
     d.draw(filename)
     return d
-
-
-def network_flow_diagram(data, layout: str = "dot",
-                         *,
-                         color_mapping: dict = None,
-                         filename: str = "plot.png",
-                         graph_opt: dict = None,
-                         node_opt: dict = None,
-                         edge_opt: dict = None):
-    p = Palette()
-    graph_opt = _concatenate(graph_opt, {
-        "format": 'png',
-        "dpi": 300,
-        "rankdir": "LR",
-        "directed": True,
-        "bgcolor": "transparent"
-    })
-
-    node_opt = _concatenate(node_opt, {
-        "style": "filled",
-        "fontname": "IBM Plex Sans",
-        "shape": "rect",
-        "fillcolor": p.yellow(shade=15)
-    })
-
-    edge_opt = _concatenate(edge_opt, {
-    })
-
-    d = pgv.AGraph(**graph_opt)
-    for key, value in node_opt.items():
-        d.node_attr[key] = value
-    for key, value in edge_opt.items():
-        d.edge_attr[key] = value
-
-    n_width = max([x[1] for x in data])
-    for row in data:
-        x, y = row[0]
-        d.add_edge(x, y)
-        e = d.get_edge(x, y)
-        e.attr['penwidth'] = 1 + 3 * (row[1] / n_width)
-        e.attr['fontsize'] = 9
-        e.attr['fontcolor'] = p.gray(shade=80)
-        e.attr['label'] = f"{row[1]}"
-
-    d.layout(layout)
-    d.draw(filename)
-    return d
-
-
-def run():
-    pass
