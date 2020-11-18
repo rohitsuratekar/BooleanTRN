@@ -6,26 +6,26 @@
 
 
 import json
+from collections import defaultdict
 
 from BooleanTRN.models.combinations import NetworkCombinations
 from BooleanTRN.visualizations.networks import *
-import networkx as nx
 
 
-def save_networks(filename="networks.txt"):
-    nc = NetworkCombinations(5, 4)
+def save_networks(filename="networks.txt", nodes=1, edges=1):
+    nc = NetworkCombinations(nodes, edges)
     nc.is_connected = True
     nc.gates = [0, 1]
     nc.interactions = [0, 1]
     with open(filename, "w") as f:
-        for n in nc.find(["11111", "01111"], ignore_oscillations=True):
+        for n in nc.find(["11111", "01111"], show_progress=True):
             data = json.dumps(n)
             print(data, file=f)
 
 
-def load_networks():
+def load_networks(filename):
     data = []
-    with open("networks.txt") as f:
+    with open(filename) as f:
         for line in f:
             network = json.loads(line.strip())
             data.append(network)
@@ -45,6 +45,7 @@ def find_isomorphic_networks(networks):
         return e1[0]["interaction"] == e2[0]["interaction"]
 
     isomorphs = []
+    nets = []
     for n in networks:
         graph = nx.MultiDiGraph()
         for edge in n:
@@ -53,6 +54,7 @@ def find_isomorphic_networks(networks):
 
         if len(isomorphs) == 0:
             isomorphs.append(graph)
+            nets.append(n)
         else:
             tmp = [nx.is_isomorphic(x, graph,
                                     node_match=_node_condition,
@@ -60,16 +62,39 @@ def find_isomorphic_networks(networks):
                                     ) for x in isomorphs]
             if not any(tmp):
                 isomorphs.append(graph)
-                print(len(isomorphs))
+                nets.append(n)
+
+    with open("isomorphs.txt", "w") as f:
+        for n in nets:
+            print(json.dumps(n), file=f)
+
+
+def steady_state_isomorphs(networks, nc: NetworkCombinations):
+    graphs = []
+    nets = defaultdict(list)
+    for n in networks:
+        g = nx.MultiDiGraph()
+        for ss in nc.get_state_space(n).items():
+            g.add_edge(ss[0], ss[1])
+        if len(graphs) == 0:
+            graphs.append(g)
+            nets[g].append(n)
+        else:
+            tmp = [nx.is_isomorphic(x, g) for x in graphs]
+            if not any(tmp):
+                graphs.append(g)
+                nets[g].append(n)
+            else:
+                nets[graphs[tmp.index(True)]].append(n)
+    del graphs
+    return list(nets.values())
 
 
 def run():
-    # save_networks()
-    data = load_networks()
-    # nc = NetworkCombinations(5, 4)
-    # ss = nc.get_state_space(data[0])
-    fake = [
-        (0, 1, 1, None),
-    ]
-    nc = NetworkCombinations(2, 1)
-    print(nc.get_state_space(fake))
+    save_networks(nodes=5, edges=6)
+    # nc = NetworkCombinations(5, 5)
+    # data = load_networks("isomorphs.txt")
+    # nets = steady_state_isomorphs(data, nc)
+    # print([len(x) for x in nets])
+    # plot_multiple_networks(nets[5][0:25], figsize=(4, 3), mark=0)
+    # ss = plot_transition_graph(nc.get_state_space(nets[5][0]))

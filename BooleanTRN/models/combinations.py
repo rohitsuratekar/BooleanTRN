@@ -8,6 +8,7 @@ import itertools as itr
 import networkx as nx
 from collections import defaultdict
 from BooleanTRN.helpers.constants import *
+from multiprocessing import Pool
 
 
 class _NetEdge:
@@ -113,9 +114,9 @@ class NetworkCombinations:
                 truth = []
                 for t in input_net[i]:
                     if t[1] == INTERACTION_POSITIVE:
-                        truth.append(init[i])
+                        truth.append(init[0])
                     elif t[1] == INTERACTION_NEGATIVE:
-                        truth.append(not init[i])
+                        truth.append(not init[0])
                     else:
                         raise AttributeError(
                             f"{t[i]} is an invalid interaction "
@@ -123,15 +124,14 @@ class NetworkCombinations:
                             f"{INTERACTION_POSITIVE} and "
                             f"{INTERACTION_NEGATIVE}")
                 if gate == GATE_OR:
-                    tmp.append(any(truth))
+                    tmp.append(int(any(truth)))
                 elif gate == GATE_AND:
-                    tmp.append(all(truth))
+                    tmp.append(int(all(truth)))
                 else:
                     raise AttributeError(f"{gate} is an invalid Gate code. "
                                          f"Available codes are: {GATE_OR}, "
                                          f"{GATE_AND}")
 
-        print(tmp, init)
         return tuple(tmp)
 
     def get_state_space(self, network: list):
@@ -163,6 +163,7 @@ class NetworkCombinations:
     def find(self, target: list = None,
              strict: bool = True,
              ignore_oscillations: bool = False,
+             show_progress: bool = False,
              ignore_steady_states: bool = False):
         if target is not None:
             for t in target:
@@ -175,7 +176,11 @@ class NetworkCombinations:
                                      f"of the target should be either 1 or 0.")
 
         nets = self.get_combinations()
+        c = 0
         for n in nets:
+            if show_progress:
+                print(f"\rScanned Combinations: {c}", end="")
+                c += 1
             if target is None:
                 yield n
             else:
