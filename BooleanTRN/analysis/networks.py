@@ -10,6 +10,8 @@ from collections import defaultdict
 
 from BooleanTRN.models.combinations import NetworkCombinations
 from BooleanTRN.visualizations.networks import *
+from BooleanTRN.visualizations.graph_properties import *
+import networkx.algorithms as algo
 
 
 def save_networks(filename="networks.txt", nodes=1, edges=1):
@@ -90,11 +92,28 @@ def steady_state_isomorphs(networks, nc: NetworkCombinations):
     return list(nets.values())
 
 
+def find_node_properties(networks):
+    degree_in = defaultdict(list)
+    degree_out = defaultdict(list)
+    for n in networks:
+        graph = nx.MultiDiGraph()
+        for k in n:
+            graph.add_edge(k[0], k[1])
+
+        for i in graph.in_degree:
+            degree_in[i[0]].append(i[1])
+
+        for i in graph.out_degree:
+            degree_out[i[0]].append(i[1])
+
+    plot_node_degrees(degree_out, "Out Degree")
+
+
 def run():
-    save_networks(nodes=5, edges=6)
-    # nc = NetworkCombinations(5, 5)
-    # data = load_networks("isomorphs.txt")
-    # nets = steady_state_isomorphs(data, nc)
-    # print([len(x) for x in nets])
-    # plot_multiple_networks(nets[5][0:25], figsize=(4, 3), mark=0)
-    # ss = plot_transition_graph(nc.get_state_space(nets[5][0]))
+    # save_networks(nodes=5, edges=5)
+    nc = NetworkCombinations(5, 6)
+    data = load_networks("sample_data/isomorphs_n5_e6.txt")
+    nets = steady_state_isomorphs(data, nc)
+    find_node_properties(nets[4])
+    # plot_transition_graph(nc.get_state_space(nets[4][0]))
+    # plot_multiple_networks(nets[4][:25], figsize=(8, 8), mark=0)

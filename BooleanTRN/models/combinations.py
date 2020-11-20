@@ -5,10 +5,11 @@
 #  All classes related to combinations
 
 import itertools as itr
-import networkx as nx
 from collections import defaultdict
+
+import networkx as nx
+
 from BooleanTRN.helpers.constants import *
-from multiprocessing import Pool
 
 
 class _NetEdge:

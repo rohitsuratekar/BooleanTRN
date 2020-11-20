@@ -145,3 +145,5 @@ cython_debug/
 BooleanTRN/networks.json
 test.txt
 BooleanTRN/networks.txt
+BooleanTRN/sample_data/
+BooleanTRN/isomorphs.txt

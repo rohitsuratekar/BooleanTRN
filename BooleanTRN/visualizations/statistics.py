@@ -89,6 +89,8 @@ def plot_combination_stat(nodes: int, edges: int, add_connected: bool = False):
         plt.legend(handles=handles, loc="center right")
 
     # plt.xscale("log")
+    print(values)
+    print(connected)
     ax = plt.gca()  # type:plt.Axes
     ax.xaxis.set_major_formatter(major_formatter)
     ax.set_facecolor(p.gray(shade=15))
@@ -106,4 +108,4 @@ def plot_combination_stat(nodes: int, edges: int, add_connected: bool = False):
 
 
 def run():
-    plot_combination_stat(5, 5, add_connected=True)
+    plot_combination_stat(5, 6, add_connected=True)
