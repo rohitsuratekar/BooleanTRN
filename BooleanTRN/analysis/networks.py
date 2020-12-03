@@ -9,9 +9,8 @@ import json
 from collections import defaultdict
 
 from BooleanTRN.models.combinations import NetworkCombinations
-from BooleanTRN.visualizations.networks import *
 from BooleanTRN.visualizations.graph_properties import *
-import networkx.algorithms as algo
+from BooleanTRN.visualizations.networks import *
 
 
 def save_networks(filename="networks.txt", nodes=1, edges=1):
@@ -34,7 +33,8 @@ def load_networks(filename):
     return data
 
 
-def find_isomorphic_networks(networks):
+def find_isomorphic_networks(networks, show_progress=True,
+                             filename="isomorphs.txt"):
     def _node_condition(n1, n2):
         try:
             return n1["gate"] == n2["gate"]
@@ -48,7 +48,11 @@ def find_isomorphic_networks(networks):
 
     isomorphs = []
     nets = []
+    ctr = 0
     for n in networks:
+        if show_progress:
+            print(f"\rScanned Combinations: {ctr}", end="")
+            ctr += 1
         graph = nx.MultiDiGraph()
         for edge in n:
             graph.add_node(edge[1], gate=edge[3])
@@ -66,7 +70,7 @@ def find_isomorphic_networks(networks):
                 isomorphs.append(graph)
                 nets.append(n)
 
-    with open("isomorphs.txt", "w") as f:
+    with open(filename, "w") as f:
         for n in nets:
             print(json.dumps(n), file=f)
 
@@ -111,9 +115,5 @@ def find_node_properties(networks):
 
 def run():
     # save_networks(nodes=5, edges=5)
-    nc = NetworkCombinations(5, 6)
-    data = load_networks("sample_data/isomorphs_n5_e6.txt")
-    nets = steady_state_isomorphs(data, nc)
-    find_node_properties(nets[4])
-    # plot_transition_graph(nc.get_state_space(nets[4][0]))
-    # plot_multiple_networks(nets[4][:25], figsize=(8, 8), mark=0)
+    nc = NetworkCombinations(5, 7)
+    data = load_networks("networks.txt")

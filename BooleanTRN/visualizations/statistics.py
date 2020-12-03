@@ -108,4 +108,4 @@ def plot_combination_stat(nodes: int, edges: int, add_connected: bool = False):
 
 
 def run():
-    plot_combination_stat(5, 6, add_connected=True)
+    plot_combination_stat(5, 3, add_connected=True)

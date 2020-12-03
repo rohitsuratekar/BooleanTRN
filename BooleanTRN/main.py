@@ -6,6 +6,6 @@
 # Main file which will deal with all functions available in this library.
 
 
-from BooleanTRN.analysis.networks import run
+from BooleanTRN.helpers.async_files import run
 
 run()
