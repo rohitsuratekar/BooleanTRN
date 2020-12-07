@@ -1,11 +1,8 @@
-#  Copyright (c) 2020. BooleanTRN
-#  Author: Rohit Suratekar
+#  Copyright (c) 2020
+#  Rohit Suratekar, Winata Lab, IIMCB, Warsaw
 #
 #  This file is part of BooleanTRN project.
-#
-# Main file which will deal with all functions available in this library.
 
-
-from BooleanTRN.helpers.async_files import run
+from BooleanTRN.analysis.networks import run
 
 run()

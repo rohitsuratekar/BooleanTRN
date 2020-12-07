@@ -1,4 +1,0 @@
-matplotlib==3.3.2
-networkx==2.5
-SecretColors==1.2.1
-pygraphviz==1.6

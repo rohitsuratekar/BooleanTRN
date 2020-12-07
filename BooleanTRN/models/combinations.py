@@ -1,8 +1,8 @@
-#  Copyright (c) 2020. BooleanTRN
-#  Author: Rohit Suratekar
+#  Copyright (c) 2020
+#  Rohit Suratekar, Winata Lab, IIMCB, Warsaw
 #
 #  This file is part of BooleanTRN project.
-#  All classes related to combinations
+
 
 import itertools as itr
 from collections import defaultdict
@@ -26,6 +26,9 @@ class _NetEdge:
 
 
 class NetworkCombinations:
+    """
+    Class to generate the network combinations
+    """
 
     def __init__(self, no_of_nodes: int,
                  no_of_edges: int,
@@ -60,7 +63,7 @@ class NetworkCombinations:
                 tmp = [x.get() for x in n]
                 yield tuple(tmp)
 
-    def _is_connected(self, graph):
+    def _is_connected(self, graph) -> bool:
         quick = set([y for x in graph for y in x[:2]])
         if len(quick) != self.no_of_nodes:
             return False
@@ -84,6 +87,10 @@ class NetworkCombinations:
             yield tmp
 
     def get_combinations(self):
+        """
+        All possible combinations for given settings
+        :return: Generator Producing Network
+        """
         n = self._get_pairs()
         n = self._add_interactions(n)
         for m in n:
@@ -100,7 +107,7 @@ class NetworkCombinations:
             tmp[n[1]].append((n[0], n[2], n[3]))
         return dict(tmp)
 
-    def _solve(self, input_net, init):
+    def _solve(self, input_net, init) -> tuple:
         tmp = []
         for i in range(self.no_of_nodes):
             if i not in input_net.keys():
@@ -135,7 +142,7 @@ class NetworkCombinations:
 
         return tuple(tmp)
 
-    def get_state_space(self, network: list):
+    def get_state_space(self, network: list) -> dict:
         net = self._input_network(network)
         tmp = itr.repeat([1, 0], self.no_of_nodes)
         state = {}
@@ -147,7 +154,7 @@ class NetworkCombinations:
         return state
 
     @staticmethod
-    def find_attracting_components(network: dict):
+    def find_attracting_components(network: dict) -> tuple:
         graph = nx.DiGraph()
         for key, value in network.items():
             graph.add_edge(key, value)
