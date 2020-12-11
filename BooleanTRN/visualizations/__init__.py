@@ -3,6 +3,3 @@
 #
 #  This file is part of BooleanTRN project.
 
-from BooleanTRN.visualizations.statistics import run
-
-run()

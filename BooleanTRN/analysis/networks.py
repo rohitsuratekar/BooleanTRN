@@ -281,4 +281,4 @@ def full_analysis(no_of_nodes: int, no_of_edges: int, steady_states: list,
 
 
 def run():
-    full_analysis(4, 3, ["1111", "0111"], chunks=3000)
+    full_analysis(5, 6, ["11111", "10100"], chunks=3000)

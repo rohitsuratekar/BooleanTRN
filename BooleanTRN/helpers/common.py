@@ -5,8 +5,8 @@
 #  Helper functions
 
 import json
+
 import networkx as nx
-from collections import defaultdict
 
 
 def load_networks(filename) -> list:
@@ -55,8 +55,3 @@ def find_isomorphic_networks(networks: list,
                 isomorphs.append(graph)
                 nets.append(n)
     return nets
-
-
-
-
-
